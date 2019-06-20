@@ -66,3 +66,6 @@ impl_zagzig!(u16, i16, -1 << 15);
 impl_zagzig!(u32, i32, -1 << 31);
 impl_zagzig!(u64, i64, -1 << 63);
 impl_zagzig!(u128, i128, -1 << 127);
+
+#[cfg(test)]
+mod tests;
