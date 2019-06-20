@@ -1,2 +1,2 @@
 test:
-	cargo test -- --nocapture
+	cargo test --release -- --nocapture
