@@ -43,7 +43,7 @@ impl Error for ErrorKind {}
 pub fn put_u64(buf: &mut Vec<u8>, mut num: u64) -> usize {
     let mut written = 0;
     while num >= OVERFLOW {
-        buf.push((num & MASK | OVERFLOW) as u8);
+        buf.push(num as u8 | OVERFLOW_U8);
         num >>= 7;
         written += 1;
     }
