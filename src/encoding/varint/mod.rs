@@ -64,7 +64,7 @@ pub fn put_i64(buf: &mut Vec<u8>, num: i64) -> usize {
 }
 
 /// Decodes a u64 from given bytes
-pub fn get_u64(data: &[u8]) -> Result<u64, ErrorKind> {
+pub fn get_u64(data: &[u8]) -> Result<(u64, usize), ErrorKind> {
     let mut read = 0;
     let mut res = 0;
     let mut bit_shift = 0;
@@ -74,7 +74,7 @@ pub fn get_u64(data: &[u8]) -> Result<u64, ErrorKind> {
 
         res |= (byte as u64 & MASK) << bit_shift;
         if byte < OVERFLOW_U8 {
-            return Ok(res);
+            return Ok((res, read + 1));
         }
 
         bit_shift += 7;
@@ -89,8 +89,8 @@ pub fn get_u64(data: &[u8]) -> Result<u64, ErrorKind> {
 }
 
 /// Decodes a i64 from given bytes
-pub fn get_i64(data: &[u8]) -> Result<i64, ErrorKind> {
-    get_u64(data).map(|uint| uint.zagzig())
+pub fn get_i64(data: &[u8]) -> Result<(i64, usize), ErrorKind> {
+    get_u64(data).map(|(uint, read)| (uint.zagzig(), read))
 }
 
 #[cfg(test)]

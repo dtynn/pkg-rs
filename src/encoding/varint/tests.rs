@@ -22,16 +22,17 @@ fn uvarint_test() {
 
         assert_eq!(
             get_u64(&buf[..written - 1]),
-            Err(ErrorKind::ShortOfData),
+            Err(ErrorKind::ShortOfData(written - 1)),
             "data w/o last byte should lead to a short of data error"
         );
 
         let decoded = get_u64(&buf[..]);
         assert_eq!(
             decoded,
-            Ok(num),
-            "expected decoded u64 number {}, got {:?}, buffer content={:?}",
+            Ok((num, written)),
+            "expected decoded u64 number {}, bytes length {},  got {:?}, buffer content={:?}",
             num,
+            written,
             decoded,
             buf
         );
@@ -59,16 +60,17 @@ fn varint_test() {
 
         assert_eq!(
             get_i64(&buf[..written - 1]),
-            Err(ErrorKind::ShortOfData),
+            Err(ErrorKind::ShortOfData(written - 1)),
             "data w/o last byte should lead to a short of data error"
         );
 
         let decoded = get_i64(&buf[..]);
         assert_eq!(
             decoded,
-            Ok(num),
-            "expected decoded i64 number {}, got {:?}, buffer content={:?}",
+            Ok((num, written)),
+            "expected decoded i64 number {}, bytes length {}, got {:?}, buffer content={:?}",
             num,
+            written,
             decoded,
             buf
         );
@@ -93,19 +95,19 @@ fn uvarint_error_test() {
 
     assert_eq!(
         get_u64(&data[..9]),
-        Err(ErrorKind::ShortOfData),
+        Err(ErrorKind::ShortOfData(9)),
         "expected err short of data for &data[..9]"
     );
 
     assert_eq!(
         get_u64(&data[..10]),
-        Err(ErrorKind::Overflow),
+        Err(ErrorKind::Overflow(10)),
         "expected err overflow for &data[..10]"
     );
 
     assert_eq!(
         get_u64(&data[..11]),
-        Err(ErrorKind::Overflow),
+        Err(ErrorKind::Overflow(10)),
         "expected err overflow for &data[..11]"
     );
 }
