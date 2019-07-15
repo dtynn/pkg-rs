@@ -21,18 +21,24 @@ const MASK: u64 = OVERFLOW - 1;
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub enum ErrorKind {
     /// Size of 7bit nums is greater than 10
-    Overflow,
+    Overflow(usize),
     /// Short of last 7bit num
-    ShortOfData,
+    ShortOfData(usize),
 }
 
 impl fmt::Display for ErrorKind {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match self {
-            ErrorKind::Overflow => write!(f, "overflows a 64-bit integer for varint encoding"),
-            ErrorKind::ShortOfData => {
-                write!(f, "not enough data for a 64-bit varint-encoded integer")
-            }
+            ErrorKind::Overflow(bytes) => write!(
+                f,
+                "overflows a 64-bit integer for varint encoding, already read {} bytes",
+                bytes,
+            ),
+            ErrorKind::ShortOfData(bytes) => write!(
+                f,
+                "not enough data for a 64-bit varint-encoded integer, already {} bytes",
+                bytes
+            ),
         }
     }
 }
@@ -76,10 +82,10 @@ pub fn get_u64(data: &[u8]) -> Result<u64, ErrorKind> {
     }
 
     if read == MAX_VARINT_LEN_U64 {
-        return Err(ErrorKind::Overflow);
+        return Err(ErrorKind::Overflow(read));
     }
 
-    Err(ErrorKind::ShortOfData)
+    Err(ErrorKind::ShortOfData(read))
 }
 
 /// Decodes a i64 from given bytes
